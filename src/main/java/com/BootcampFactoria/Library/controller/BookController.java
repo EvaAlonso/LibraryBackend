@@ -1,84 +1,113 @@
 package com.BootcampFactoria.Library.controller;
 
-import com.BootcampFactoria.Library.exception.ObjectNotFoundException;
+import com.BootcampFactoria.Library.DTOs.Book.BookDetailsDTO;
+import com.BootcampFactoria.Library.DTOs.Book.BookMapper;
+import com.BootcampFactoria.Library.DTOs.Book.BookSummaryDTO;
+import com.BootcampFactoria.Library.DTOs.ErrorDTO;
+import com.BootcampFactoria.Library.model.Author;
 import com.BootcampFactoria.Library.model.Book;
+import com.BootcampFactoria.Library.model.Genre;
+import com.BootcampFactoria.Library.service.AuthorService;
 import com.BootcampFactoria.Library.service.BookService;
+import com.BootcampFactoria.Library.service.GenreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
+    private final AuthorService authorService;
+    private final GenreService genreService;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, AuthorService authorService, GenreService genreService) {
         this.bookService = bookService;
+        this.authorService = authorService;
+        this.genreService = genreService;
     }
 
     @GetMapping
-    public List<Book> getAllBooks(){
-        return bookService.getAll();
+    public ResponseEntity<List<BookSummaryDTO>> getAllBooks() {
+        //busca libros y convierte entidades a DTO
+        List<BookSummaryDTO> books = bookService.findAll().stream()
+                .map(book -> BookMapper.toSummaryDTO(book))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Book> createBook(@RequestBody Book newBook){
-        try {
-            Book createdBook =  bookService.addBook(newBook);
-            return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-    @DeleteMapping("/{id}")
-    public void deleteProductById(@PathVariable int id){
-        bookService.deleteBook(id);
-    }
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findBookById(@PathVariable int id){
-        Optional<Book> foundBook = bookService.findBook(id);
-        if(foundBook.isPresent()){
-            return new ResponseEntity<>(foundBook.get(), HttpStatus.FOUND);
+    public ResponseEntity<BookDetailsDTO> getBookById(@PathVariable int id) {
+        //comprueba si existe libro
+        Optional<Book> bookOptional = bookService.findById(id);
+        if (bookOptional.isPresent()) {
+            //convierte entidad en DTO
+            BookDetailsDTO bookDetails = BookMapper.toDetailsDTO(bookOptional.get());
+            return new ResponseEntity<>(bookDetails, HttpStatus.OK);
         }
-        throw new ObjectNotFoundException("Book", id);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable int id, @RequestBody Book updatedBook){
+
+    @PostMapping
+    public ResponseEntity<?> createBook(@RequestBody BookDetailsDTO book) {
         try {
-            //actualizar los campos del book en el caso de que encuentre
-            Book book = bookService.updatedBook(id, updatedBook);
-            return new ResponseEntity<>(book, HttpStatus.OK);
-        } catch (Exception e) {
-            //en el caso de que no encuentre devuelve not found
-            throw new ObjectNotFoundException("Book", id);
+            //comprueba si ISBN ya existe
+            if (bookService.existsByIsbn(book.isbn())) {
+                throw new IllegalArgumentException("El ISBN ya existe.");
+            }
+            //comprueba si existen autores y si no, los crea
+            List<Author> authors = book.authors().stream()
+                    .map(authorDTO -> authorService.findAuthorByName(authorDTO.name())
+                            .orElseGet(() -> authorService.create(new Author(authorDTO.name()))))
+                    .collect(Collectors.toList());
+            //comprueba si existen los géneros y si no, los crea
+            List<Genre> genres = book.genres().stream()
+                    .map(genreDTO -> genreService.findGenreByName(genreDTO.name())
+                            .orElseGet(() -> genreService.createGenre(new Genre(genreDTO.name()))))
+                    .collect(Collectors.toList());
+            //convierte el DTO en entidad Book
+            Book newBook = BookMapper.toEntity(book, authors, genres);
+            Book savedBook = bookService.create(newBook);
+            return new ResponseEntity<>(BookMapper.toDetailsDTO(savedBook), HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            ErrorDTO errorResponse = new ErrorDTO("BAD_REQUEST", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }
-    @RequestMapping("/isbn/{isbn}")
-    public ResponseEntity<Book> findBookWithIsbn(@PathVariable String isbn) {
 
-        Optional<Book> foundBookWithIsbn = bookService.findBookByIsbn(isbn);
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDetailsDTO> updateBook(@PathVariable int id, @RequestBody BookDetailsDTO book) {
+        //búsqueda del libro
+        Optional<Book> existingBook = bookService.findById(id);
+        if (existingBook.isPresent()) {
+            //comprueba si existen autores y si no, los crea
+            List<Author> authors = book.authors().stream()
+                    .map(authorDTO -> authorService.findAuthorByName(authorDTO.name()).orElseThrow())
+                    .collect(Collectors.toList());
 
-        if(foundBookWithIsbn.isPresent()) { return new ResponseEntity<>(foundBookWithIsbn.get(), HttpStatus.FOUND); } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            //comprueba si existen los géneros y si no, los crea
+            List<Genre> genres = book.genres().stream()
+                    .map(genreDTO -> genreService.findGenreByName(genreDTO.name()).orElseThrow())
+                    .collect(Collectors.toList());
+            //convierte el DTO en entidad Book
+            Book updatedBook = BookMapper.toEntity(book, authors, genres);
+            updatedBook.setId(id);
+            Book savedBook = bookService.updateBook(id, updatedBook);
+            return new ResponseEntity<>(BookMapper.toDetailsDTO(savedBook), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-
-    @RequestMapping("/title/{title}")
-    public ResponseEntity<Book> findBookWithTitle(@PathVariable String title) {
-
-        Optional<Book> foundBookWithTitle = bookService.findBookByTitle(title);
-
-        if(foundBookWithTitle.isPresent()) { return new ResponseEntity<>(foundBookWithTitle.get(), HttpStatus.FOUND); } else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    @GetMapping("/genre/{genreTitle}")
-    public List<Book> getBooksByGenre(@PathVariable String genreTitle){
-        return bookService.findBookByGenre(genreTitle);
-    }
-    @GetMapping("/author/{authorName}")
-    public List<Book> getBooksByAuthor(@PathVariable String authorName) {
-        return bookService.findBookByAuthors(authorName);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable int id) {
+        if (bookService.findById(id).isPresent()) {
+            bookService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

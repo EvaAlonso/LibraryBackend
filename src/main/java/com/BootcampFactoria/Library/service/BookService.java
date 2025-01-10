@@ -1,14 +1,7 @@
 package com.BootcampFactoria.Library.service;
 
-
-
-import com.BootcampFactoria.Library.exception.*;
-import com.BootcampFactoria.Library.model.Author;
 import com.BootcampFactoria.Library.model.Book;
-import com.BootcampFactoria.Library.model.Genre;
-import com.BootcampFactoria.Library.repository.AuthorRepository;
 import com.BootcampFactoria.Library.repository.BookRepository;
-import com.BootcampFactoria.Library.repository.GenreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,82 +9,66 @@ import java.util.Optional;
 
 @Service
 public class BookService {
-    private final BookRepository bookRepository;
-    private final GenreRepository genreRepository;
-    private final AuthorRepository authorRepository;
 
-    public BookService(BookRepository bookRepository, GenreRepository genreRepository, AuthorRepository authorRepository) {
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
-        this.genreRepository = genreRepository;
-        this.authorRepository = authorRepository;
     }
 
-
-    public List<Book> getAll(){
+    public List<Book> findAll() {
         return bookRepository.findAll();
     }
-    public Book addBook(Book newBook){
-        int genreId = newBook.getGenre().getId();
-        Optional<Genre> optionalGenre = genreRepository.findById(genreId);
-        if(optionalGenre.isPresent()){
-            Genre genre = optionalGenre.get();
-            newBook.setGenre(genre);
-            return bookRepository.save(newBook);
-        }
-        throw new GenreNotFoundException(newBook.getGenre().getTitle());
-    }
-    public void deleteBook(int id){
-        bookRepository.deleteById(id);
-    }
-    public Optional<Book> findBook(int id){
-        Optional<Book> foundBook = bookRepository.findById(id);
-        if (foundBook.isPresent()){
-            return bookRepository.findById(id);
-        } throw new ObjectNotFoundException("Book", id);
-    }
-    public Book updatedBook(int id, Book updatedBook){
 
-        Optional<Book> foundBook = bookRepository.findById(id);
-
-        if(foundBook.isPresent()){
-            Book existingBook = foundBook.get();
-
-            existingBook.setIsbn(updatedBook.getIsbn());
-            existingBook.setTitle(updatedBook.getTitle());
-            existingBook.setDescription(updatedBook.getDescription());
-            existingBook.setState(updatedBook.getState());
-
-            return bookRepository.save(existingBook);
-        }
-        throw new ObjectNotFoundException("Book", id);
-    }
-    public Optional<Book> findBookByIsbn(String isbn) {
-        Optional<Book> book = bookRepository.findByIsbn(isbn);
-        if(book.isEmpty()){
-            throw new IsbnNotFoundException(isbn);
-        }
-        return book;
-    }
-    public Optional<Book> findBookByTitle(String title) {
-        Optional<Book> book = bookRepository.findByTitle(title);
-        if (book.isEmpty()){
-            throw new TitleNotFoundException(title);
-        }
-        return book;
+    public Optional<Book> findById(int id) {
+        return bookRepository.findById(id);
     }
 
-    public List<Book> findBookByGenre(String title) {
-        Genre genre = genreRepository.findByTitle(title);
-        if (genre != null){
-            return bookRepository.findByGenre(genre);
-        }
-        throw new GenreNotFoundException(title);
+    public List<Book> findByAuthorsId(int authorsId) {
+        return bookRepository.findByAuthors_Id(authorsId);
     }
-    public List<Book> findBookByAuthors(String name) {
-        Author author = authorRepository.findByName(name);
-        if(author != null){
-            return bookRepository.findByAuthors(author);
+
+    public List<Book> findByGenresId(int genreId) {
+        return bookRepository.findByGenres_Id(genreId);
+    }
+
+    public Optional<Book> findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn);
+    }
+
+    public Book create(Book newBook) {
+        if (bookRepository.existsById(newBook.getId())) {
+            throw new IllegalArgumentException("ISBN already exists.");
         }
-        throw new AuthorNotFoundException(name);
+        return bookRepository.save(newBook);
+    }
+
+    public Book updateBook(int id, Book bookDetails) {
+        //comprobación de existencia del libro
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Book with id " + id + " not found."));
+        //comprobación de ISBN
+        if (!existingBook.getIsbn().equals(bookDetails.getIsbn()) && bookRepository.existsByIsbn(bookDetails.getIsbn())) {
+            throw new IllegalArgumentException("ISBN already exists");
+        }
+
+        existingBook.setTitle(bookDetails.getTitle());
+        existingBook.setAuthors(bookDetails.getAuthors());
+        existingBook.setDescription(bookDetails.getDescription());
+        existingBook.setGenres(bookDetails.getGenres());
+
+        return bookRepository.save(existingBook);
+    }
+
+    public String delete(int id) {
+        if(bookRepository.existsById(id)) {
+            bookRepository.deleteById(id);
+            return "Book with id " + id + " deleted successfully.";
+        }
+        return "Book with id " + id + " not found.";
+    }
+
+    public boolean existsByIsbn(String isbn) {
+        return bookRepository.existsByIsbn(isbn);
     }
 }

@@ -36,4 +36,14 @@ public class LibraryExceptionHandle {
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(BookNotAvailableException.class)
+    public ResponseEntity<Object> handleBookNotAvailableException(BookNotAvailableException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(LoanNotActiveException.class)
+    public ResponseEntity<Object> handleLoanNotActiveException(LoanNotActiveException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
 }

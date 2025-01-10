@@ -22,7 +22,7 @@ public class Genre {
     private String title;
 
 
-    @OneToMany(mappedBy = "genre")
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
 

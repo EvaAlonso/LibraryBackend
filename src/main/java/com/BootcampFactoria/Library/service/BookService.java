@@ -31,14 +31,7 @@ public class BookService {
         return bookRepository.findAll();
     }
     public Book addBook(Book newBook){
-        int genreId = newBook.getGenre().getId();
-        Optional<Genre> optionalGenre = genreRepository.findById(genreId);
-        if(optionalGenre.isPresent()){
-            Genre genre = optionalGenre.get();
-            newBook.setGenre(genre);
-            return bookRepository.save(newBook);
-        }
-        throw new GenreNotFoundException(newBook.getGenre().getTitle());
+        return bookRepository.save(newBook);
     }
     public void deleteBook(int id){
         bookRepository.deleteById(id);
@@ -59,7 +52,6 @@ public class BookService {
             existingBook.setIsbn(updatedBook.getIsbn());
             existingBook.setTitle(updatedBook.getTitle());
             existingBook.setDescription(updatedBook.getDescription());
-            existingBook.setState(updatedBook.getState());
 
             return bookRepository.save(existingBook);
         }
@@ -83,7 +75,7 @@ public class BookService {
     public List<Book> findBookByGenre(String title) {
         Genre genre = genreRepository.findByTitle(title);
         if (genre != null){
-            return bookRepository.findByGenre(genre);
+            return bookRepository.findByGenres(genre);
         }
         throw new GenreNotFoundException(title);
     }

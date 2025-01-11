@@ -19,12 +19,14 @@ public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String title;
+    private String name;
 
-
-    @OneToMany(mappedBy = "genre")
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
 
+    public Genre(String name) {
+        this.name = name;
+    }
 
 }

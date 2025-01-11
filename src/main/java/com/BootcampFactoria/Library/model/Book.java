@@ -19,7 +19,10 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title;
+
+    @Column(unique = true)
     private String isbn;
+
     private String description;
     private Boolean isAvailable;
 
@@ -32,9 +35,20 @@ public class Book {
     private List<Author> authors;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "genre_id")
+    @ManyToMany
+    @JoinTable(
+            name = "book_genres",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private List<Genre> genres;
 
-    private Genre genre;
+    public Book (String title, List<Author> authors, String isbn, String description, List<Genre> genres) {
+        this.title = title;
+        this.isbn = isbn;
+        this.description = description;
+        this.authors = authors;
+        this.genres = genres;
+    }
 
 }

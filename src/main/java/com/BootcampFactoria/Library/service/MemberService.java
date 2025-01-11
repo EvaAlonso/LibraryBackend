@@ -28,7 +28,7 @@ public class MemberService {
     public Optional<Member> findMember(int id){
         Optional<Member> foundMember = memberRepository.findById(id);
         if (foundMember.isPresent()){
-            return memberRepository.findById(id);
+            return foundMember;
         }
         throw new ObjectNotFoundException("Member", id);
     }

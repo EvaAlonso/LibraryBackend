@@ -33,7 +33,7 @@ public class GenreService {
         if(foundGenre.isPresent()){
             Genre existingGenre = foundGenre.get();
 
-            existingGenre.setTitle(updateGenre.getTitle());
+            existingGenre.setName(updateGenre.getName());
 
             return genreRepository.save(existingGenre);
         }

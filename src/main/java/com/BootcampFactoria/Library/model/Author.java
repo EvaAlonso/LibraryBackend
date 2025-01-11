@@ -25,4 +25,14 @@ public class Author {
     @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books;
+
+    public Author(String name, String biography, List<Book> author_books) {
+        this.name = name;
+        this.biography = biography;
+        this.books = author_books;
+    }
+
+    public Author(String name) {
+        this.name = name;
+    }
 }

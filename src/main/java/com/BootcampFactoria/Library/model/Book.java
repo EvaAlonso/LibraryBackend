@@ -19,6 +19,8 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title;
+
+    @Column(unique = true)
     private String isbn;
     private String description;
     private Boolean isAvailable;

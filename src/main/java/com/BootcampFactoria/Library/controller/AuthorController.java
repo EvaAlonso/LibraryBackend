@@ -2,8 +2,11 @@ package com.BootcampFactoria.Library.controller;
 
 
 
+import com.BootcampFactoria.Library.DTOs.Author.AuthorDTO;
+import com.BootcampFactoria.Library.DTOs.Author.AuthorMapper;
 import com.BootcampFactoria.Library.model.Author;
 import com.BootcampFactoria.Library.service.AuthorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,11 @@ public class AuthorController {
         return authorService.getAll();
     }
     @PostMapping
-    public void createAuthor(@RequestBody Author newAuthor){
-        authorService.addAuthor(newAuthor);
+    public ResponseEntity<AuthorDTO> createAuthor(@Valid @RequestBody AuthorDTO authorDTO){
+        Author newAuthor = AuthorMapper.AuthorDTOToEntity(authorDTO);
+        Author createdAuthor = authorService.addAuthor(newAuthor);
+        AuthorDTO createdAuthorDTO = AuthorMapper.authorEntityToDTO(createdAuthor);
+        return new ResponseEntity<>(createdAuthorDTO, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public void deleteAuthorById(@PathVariable int id){

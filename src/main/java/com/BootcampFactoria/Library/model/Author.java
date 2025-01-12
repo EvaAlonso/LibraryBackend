@@ -2,6 +2,7 @@ package com.BootcampFactoria.Library.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,5 +32,8 @@ public class Author {
     }
 
     public Author(String name, String biography, List<Book> authorBooks) {
+    }
+
+    public Author(@NotEmpty(message = "Name is required") String name, @NotEmpty(message = "biography is required") String biography) {
     }
 }

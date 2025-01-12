@@ -2,9 +2,12 @@ package com.BootcampFactoria.Library.controller;
 
 
 
+import com.BootcampFactoria.Library.DTOs.Genre.GenreDTO;
+import com.BootcampFactoria.Library.DTOs.Genre.GenreMapper;
 import com.BootcampFactoria.Library.exception.ObjectNotFoundException;
 import com.BootcampFactoria.Library.model.Genre;
 import com.BootcampFactoria.Library.service.GenreService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +29,11 @@ public class GenreController {
         return genreService.getAll();
     }
     @PostMapping
-    public void createGenre(@RequestBody Genre newGenre){
-        genreService.addGenre(newGenre);
+    public ResponseEntity<GenreDTO> createGenre(@Valid @RequestBody GenreDTO genreDTO){
+        Genre newGenre = GenreMapper.genreDTOToEntity(genreDTO);
+        Genre createdGenre = genreService.addGenre(newGenre);
+        GenreDTO createdGenreDTO = GenreMapper.genreEntityToDTO(createdGenre);
+        return new ResponseEntity<>(createdGenreDTO, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public void deleteGenreById(@PathVariable int id){

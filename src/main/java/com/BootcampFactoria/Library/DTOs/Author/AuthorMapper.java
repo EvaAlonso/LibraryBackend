@@ -1,21 +1,18 @@
 package com.BootcampFactoria.Library.DTOs.Author;
 
 import com.BootcampFactoria.Library.model.Author;
-import com.BootcampFactoria.Library.model.Book;
-
-import java.util.List;
 
 public class AuthorMapper {
 
-    public static Author toEntity(AuthorDTO authorDTORequest, List<Book> author_books) {
+    public static Author AuthorDTOToEntity(AuthorDTO authorDTO) {
          return new Author(
-                authorDTORequest.name(),
-                authorDTORequest.biography(),
-                author_books
+                authorDTO.name(),
+                authorDTO.biography()
+
         );
     }
 
-    public static AuthorDTO toDTORequest(Author author) {
+    public static AuthorDTO authorEntityToDTO(Author author) {
         return new AuthorDTO(
                 author.getName(),
                 author.getBiography()

@@ -2,8 +2,11 @@ package com.BootcampFactoria.Library.controller;
 
 
 
+import com.BootcampFactoria.Library.DTOs.Member.MemberDTO;
+import com.BootcampFactoria.Library.DTOs.Member.MemberMapper;
 import com.BootcampFactoria.Library.model.Member;
 import com.BootcampFactoria.Library.service.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +31,11 @@ public class MemberController {
     }
 
     @PostMapping
-    public Member createMember(@RequestBody Member newMember){
-        return memberService.addMember(newMember);
+    public ResponseEntity<MemberDTO> createMember(@Valid @RequestBody MemberDTO memberDTO){
+        Member newMember = MemberMapper.MemberDTOToEntity(memberDTO);
+        Member createdMember = memberService.addMember(newMember);
+        MemberDTO createdMemberDTO = MemberMapper.memberEntityToDTO(createdMember);
+        return new ResponseEntity<>(createdMemberDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

@@ -3,6 +3,7 @@ package com.BootcampFactoria.Library.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,11 +30,17 @@ public class Author {
 
 
     public Author(String name) {
+        this.name = name;
     }
 
     public Author(String name, String biography, List<Book> authorBooks) {
+        this.name = name;
+        this.biography = biography;
     }
 
-    public Author(@NotEmpty(message = "Name is required") String name, @NotEmpty(message = "biography is required") String biography) {
+
+    public Author( String name,  String biography) {
+        this.name = name;
+        this.biography = biography;
     }
 }

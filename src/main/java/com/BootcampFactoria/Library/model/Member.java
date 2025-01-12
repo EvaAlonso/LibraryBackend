@@ -26,4 +26,8 @@ public class Member {
     @JsonIgnoreProperties("member")
     private List<Loan> loans;
 
+    public Member(String name, String surname) {
+        this.name = name;
+        this.surname = surname;
+    }
 }

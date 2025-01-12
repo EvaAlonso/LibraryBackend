@@ -26,4 +26,6 @@ public class Genre {
     private List<Book> books;
 
 
+    public Genre(String name) {
+    }
 }

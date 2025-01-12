@@ -72,18 +72,23 @@ public class BookService {
         return book;
     }
 
-    public List<Book> findBookByGenre(String title) {
-        Genre genre = genreRepository.findByTitle(title);
-        if (genre != null){
+    public List<Book> findGenreByName(String name) {
+        Optional<Genre> genre = genreRepository.findByName(name);
+        if (genre.isPresent()){
             return bookRepository.findByGenres(genre);
         }
-        throw new GenreNotFoundException(title);
+        throw new GenreNotFoundException(name);
     }
-    public List<Book> findBookByAuthors(String name) {
-        Author author = authorRepository.findByName(name);
-        if(author != null){
-            return bookRepository.findByAuthors(author);
+    public List<Book> findAuthorByName(String name) {
+        Optional<Author> author = authorRepository.findByName(name);
+        if(author.isPresent()){
+            return bookRepository.findByAuthors(author.get());
         }
         throw new AuthorNotFoundException(name);
     }
+    public boolean existsByIsbn(String isbn) {
+        return bookRepository.existsByIsbn(isbn);  // Verifica en el repositorio si el ISBN existe
+    }
+
+
 }

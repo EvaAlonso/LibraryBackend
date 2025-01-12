@@ -39,5 +39,9 @@ public class GenreService {
         }
         throw new RuntimeException("Genre not found with id: " + id);
     }
+    public Optional<Genre> findGenreByName(String name) {
+        return genreRepository.findByName(name);
+    }
+
 
 }

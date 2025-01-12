@@ -8,7 +8,7 @@ import java.util.List;
 public class AuthorMapper {
 
     public static Author toEntity(AuthorDTO authorDTORequest, List<Book> author_books) {
-        return new Author(
+         return new Author(
                 authorDTORequest.name(),
                 authorDTORequest.biography(),
                 author_books
@@ -22,10 +22,4 @@ public class AuthorMapper {
         );
     }
 
-    public static AuthorDTO toDTOResponse(Author author) {
-        return new AuthorDTO(
-                author.getName(),
-                author.getBiography()
-        );
-    }
 }

@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 
 public class BookMapper {
 
-    public static Book toEntity(BookDetailsDTO bookDetailsDTO, List<Author> authors, List<Genre> gernes) {
-        return new Book(
-                bookDetailsDTO.title(),
-                authors,
-                bookDetailsDTO.isbn(),
-                bookDetailsDTO.description(),
-                gernes
-        );
+    public static Book toEntity(BookDetailsDTO bookDetailsDTO, List<Author> authors, List<Genre> genres) {
+        Book book = new Book();
+        book.setIsbn(bookDetailsDTO.isbn());
+        book.setTitle(bookDetailsDTO.title());
+        book.setAuthors(authors);
+        book.setGenres(genres);
+
+        return book;
     }
 
     public static BookDetailsDTO toDetailsDTO(Book book) {

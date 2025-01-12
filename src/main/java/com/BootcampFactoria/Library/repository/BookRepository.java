@@ -11,12 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
-    List<Book> findByAuthors_Id(int authorId);
-    List<Book> findByGenres_Id(int genreId);
-    List<Book> findByTitleContainingIgnoreCase(String title);
     Optional<Book> findByIsbn(String isbn);
     Optional<Book> findByTitle(String title);
     List<Book> findByAuthors(Author author);
-    List<Book> findByGenre(Genre genre);
-
+    List<Book> findByGenres(Optional<Genre> genre);
+    boolean existsByIsbn(String isbn);
 }

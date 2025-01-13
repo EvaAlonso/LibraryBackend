@@ -24,30 +24,32 @@ public class BookService {
         this.authorRepository = authorRepository;
     }
 
-    public List<Book> getAll(){
+
+    public List<Book> getAll() {
         return bookRepository.findAll();
     }
 
-    public Book addBook(Book newBook){
+    public Book addBook(Book newBook) {
         return bookRepository.save(newBook);
     }
 
-    public void deleteBook(int id){
+    public void deleteBook(int id) {
         bookRepository.deleteById(id);
     }
 
-    public Optional<Book> findBook(int id){
+    public Optional<Book> findBook(int id) {
         Optional<Book> foundBook = bookRepository.findById(id);
-        if (foundBook.isPresent()){
+        if (foundBook.isPresent()) {
             return bookRepository.findById(id);
-        } throw new ObjectNotFoundException("Book", id);
+        }
+        throw new ObjectNotFoundException("Book", id);
     }
 
-    public Book updateBook(int id, Book updatedBook){
+    public Book updatedBook(int id, Book updatedBook) {
 
         Optional<Book> foundBook = bookRepository.findById(id);
 
-        if(foundBook.isPresent()){
+        if (foundBook.isPresent()) {
             Book existingBook = foundBook.get();
 
             existingBook.setIsbn(updatedBook.getIsbn());
@@ -61,15 +63,15 @@ public class BookService {
 
     public Optional<Book> findBookByIsbn(String isbn) {
         Optional<Book> book = bookRepository.findByIsbn(isbn);
-        if(book.isEmpty()){
+        if (book.isEmpty()) {
             throw new IsbnNotFoundException(isbn);
         }
         return book;
     }
 
-    public List<Book> findBookByTitle(String title) {
-        List<Book> book = bookRepository.findByTitleContainingIgnoreCase(title);
-        if (book.isEmpty()){
+    public Optional<Book> findBookByTitle(String title) {
+        Optional<Book> book = bookRepository.findByTitle(title);
+        if (book.isEmpty()) {
             throw new TitleNotFoundException(title);
         }
         return book;
@@ -78,7 +80,7 @@ public class BookService {
     public List<Book> findBookByGenre(String name) {
         Optional<Genre> genre = genreRepository.findByNameContainingIgnoreCase(name);
 
-        if (genre != null){
+        if (genre != null) {
             return bookRepository.findByGenre(genre);
         }
 
@@ -88,14 +90,15 @@ public class BookService {
     public List<Book> findBookByAuthor(String name) {
         Optional<Author> author = authorRepository.findByNameContainingIgnoreCase(name);
 
-        if(author != null){
+        if (author != null) {
             return bookRepository.findByAuthors(author);
         }
 
         throw new AuthorNotFoundException(name);
     }
 
-    public boolean existsByIsbn (String isbn) {
+    public boolean existsByIsbn(String isbn) {
         return bookRepository.existsByIsbn(isbn);
     }
+
 }

@@ -63,7 +63,7 @@ public class BookController {
             //comprueba si existen autores y si no, los crea
             List<Author> authors = book.authors().stream()
                     .map(authorDTO -> authorService.findAuthorByName(authorDTO.name())
-                            .orElseGet(() -> authorService.create(new Author(authorDTO.name()))))
+                            .orElseGet(() -> authorService.addAuthor(new Author(authorDTO.name()))))
                     .collect(Collectors.toList());
             //comprueba si existen los géneros y si no, los crea
             List<Genre> genres = book.genres().stream()
@@ -97,7 +97,7 @@ public class BookController {
             //convierte el DTO en entidad Book
             Book updatedBook = BookMapper.toEntity(book, authors, genres);
             updatedBook.setId(id);
-            Book savedBook = bookService.updateBook(id, updatedBook);
+            Book savedBook = bookService.updatedBook(id, updatedBook);
             return new ResponseEntity<>(BookMapper.toDetailsDTO(savedBook), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

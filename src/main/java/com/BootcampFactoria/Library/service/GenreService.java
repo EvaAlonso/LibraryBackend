@@ -48,5 +48,4 @@ public class GenreService {
         }
         throw new RuntimeException("Genre not found with id: " + id);
     }
-
 }

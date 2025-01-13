@@ -15,18 +15,27 @@ public class GenreService {
     public GenreService(GenreRepository genreRepository){
         this.genreRepository = genreRepository;
     }
+
     public List<Genre> getAll(){
         return genreRepository.findAll();
     }
+
     public Genre addGenre(Genre newGenre){
         return genreRepository.save(newGenre);
     }
+
     public void deleteGenre(int id){
         genreRepository.deleteById(id);
     }
+
     public Optional<Genre> findGenre(int id){
         return genreRepository.findById(id);
     }
+
+    public Optional<Genre> findGenreByName(String genre) {
+        return genreRepository.findByNameContainingIgnoreCase(genre);
+    }
+
     public Genre updateGenre(int id, Genre updateGenre){
         Optional<Genre> foundGenre = genreRepository.findById(id);
 

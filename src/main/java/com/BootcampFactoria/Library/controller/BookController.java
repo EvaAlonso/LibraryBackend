@@ -35,7 +35,7 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<BookSummaryDTO>> getAllBooks() {
         //busca libros y convierte entidades a DTO
-        List<BookSummaryDTO> books = bookService.findAll().stream()
+        List<BookSummaryDTO> books = bookService.getAll().stream()
                 .map(book -> BookMapper.toSummaryDTO(book))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(books, HttpStatus.OK);
@@ -44,7 +44,7 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookDetailsDTO> getBookById(@PathVariable int id) {
         //comprueba si existe libro
-        Optional<Book> bookOptional = bookService.findById(id);
+        Optional<Book> bookOptional = bookService.findBook(id);
         if (bookOptional.isPresent()) {
             //convierte entidad en DTO
             BookDetailsDTO bookDetails = BookMapper.toDetailsDTO(bookOptional.get());
@@ -68,11 +68,11 @@ public class BookController {
             //comprueba si existen los géneros y si no, los crea
             List<Genre> genres = book.genres().stream()
                     .map(genreDTO -> genreService.findGenreByName(genreDTO.name())
-                            .orElseGet(() -> genreService.createGenre(new Genre(genreDTO.name()))))
+                            .orElseGet(() -> genreService.addGenre(new Genre(genreDTO.name()))))
                     .collect(Collectors.toList());
             //convierte el DTO en entidad Book
             Book newBook = BookMapper.toEntity(book, authors, genres);
-            Book savedBook = bookService.create(newBook);
+            Book savedBook = bookService.addBook(newBook);
             return new ResponseEntity<>(BookMapper.toDetailsDTO(savedBook), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             ErrorDTO errorResponse = new ErrorDTO("BAD_REQUEST", e.getMessage());
@@ -83,7 +83,7 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<BookDetailsDTO> updateBook(@PathVariable int id, @RequestBody BookDetailsDTO book) {
         //búsqueda del libro
-        Optional<Book> existingBook = bookService.findById(id);
+        Optional<Book> existingBook = bookService.findBook(id);
         if (existingBook.isPresent()) {
             //comprueba si existen autores y si no, los crea
             List<Author> authors = book.authors().stream()
@@ -105,8 +105,8 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable int id) {
-        if (bookService.findById(id).isPresent()) {
-            bookService.delete(id);
+        if (bookService.findBook(id).isPresent()) {
+            bookService.deleteBook(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

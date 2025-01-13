@@ -25,5 +25,8 @@ public class Genre {
     @JsonIgnore
     private List<Book> books;
 
+    public Genre(String name) {
+        this.name = name;
+    }
 
 }

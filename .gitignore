@@ -7,7 +7,6 @@ target/
 ### STS ###
 .apt_generated
 .classpath
-.env
 .factorypath
 .project
 .settings
@@ -32,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### ENVIRONTMENT VARIABLES
+.env

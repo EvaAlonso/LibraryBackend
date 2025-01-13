@@ -9,5 +9,6 @@ public record BookSummaryDTO(
     String title,
     List<AuthorDTO> authorsName,
     String isbn,
+    String cover_url,
     List<GenreDTO> genresName
 ) {}

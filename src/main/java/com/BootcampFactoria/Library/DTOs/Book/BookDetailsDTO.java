@@ -4,7 +4,6 @@ import com.BootcampFactoria.Library.DTOs.Author.AuthorDTO;
 import com.BootcampFactoria.Library.DTOs.Genre.GenreDTO;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import org.hibernate.engine.internal.ImmutableEntityEntry;
 
 import java.util.List;
 
@@ -17,6 +16,7 @@ public record BookDetailsDTO(
         @NotEmpty(message = "ISBN is required.")
         @Size(min = 13, max = 13, message = "ISBN must be 13 characters.")
         String isbn,
+        String cover_url,
         String description,
         List<GenreDTO> genres
 ) {}

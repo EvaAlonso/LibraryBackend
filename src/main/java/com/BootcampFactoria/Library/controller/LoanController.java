@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/loans")
+@RequestMapping("/api/loans")
 public class LoanController {
     private final LoanService loanService;
 
     public LoanController(LoanService loanService) {
         this.loanService = loanService;
     }
+
     @PostMapping
     public ResponseEntity<Loan> createLoan(@RequestParam int bookId, @RequestParam int memberId) {
 

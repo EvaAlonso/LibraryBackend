@@ -16,6 +16,7 @@ public class BookMapper {
                 bookDetailsDTO.title(),
                 authors,
                 bookDetailsDTO.isbn(),
+                bookDetailsDTO.cover_url(),
                 bookDetailsDTO.description(),
                 gernes
         );
@@ -27,6 +28,7 @@ public class BookMapper {
                 book.getAuthors().stream().map(author -> new AuthorDTO(author.getName(), author.getBiography()))
                         .collect(Collectors.toList()),
                 book.getIsbn(),
+                book.getCover_url(),
                 book.getDescription(),
                 book.getGenres().stream().map(genre -> new GenreDTO(genre.getName()))
                         .collect(Collectors.toList())
@@ -39,6 +41,7 @@ public class BookMapper {
                 book.getAuthors().stream().map(author -> new AuthorDTO(author.getName(), author.getBiography()))
                         .collect(Collectors.toList()),
                 book.getIsbn(),
+                book.getCover_url(),
                 book.getGenres().stream().map(genre -> new GenreDTO(genre.getName()))
                         .collect(Collectors.toList())
         );
